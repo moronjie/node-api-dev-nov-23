@@ -1,3 +1,4 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
 function verifyToken(req,res,next)
@@ -7,7 +8,7 @@ function verifyToken(req,res,next)
     {
         let token =  req.headers.authorization.split(" ")[1];
 
-        jwt.verify(token,"nutrifyapp",(err,data)=>{
+        jwt.verify(token, process.env.JWT_SECRET, (err,data)=>{
             if(!err)
             {
                 next();
