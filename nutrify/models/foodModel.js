@@ -29,6 +29,10 @@ const foodSchema = mongoose.Schema({
     fiber:{
         type:Number,
         required:true,
+    },
+    cloudID:{
+        type:String,
+        required:true,
     }
 
 },{timestamps:true})

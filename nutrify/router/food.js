@@ -2,7 +2,8 @@ const router = express.Router();
 const foodModel = require("../models/foodModel")
 const verifyToken = require("../middleware/verifyToken")
 const {customError} = require("../middleware/errorMiddleware")
-
+const upload = require("../middleware/multer")
+const {cloudinary} = require("../config/cloudinary")
 
 // endpoint to fetch all foods 
 router.get("/foods", verifyToken, async(req, res, next)=>{
@@ -22,11 +23,19 @@ router.get("/foods", verifyToken, async(req, res, next)=>{
 
 
 //endpoint to create food 
-router.post("/foods", verifyToken, async (req, res, next)=>{
+router.post("/foods", upload.single("imageUrl"), verifyToken, async (req, res, next)=>{
     let foodData = req.body;
+    if(!foodData.name || !foodData.calories || !foodData.fat || !foodData.carbs || !foodData.protein){
+        return next(customError(400, "Please provide all the required fields"))
+    }
+
+    if(req.file==undefined){
+        return next(customError(400, "Please provide a valid image"))
+    }
+    const cloud_img = await cloudinary.uploader.upload(req.file.path);
 
     try {
-        const newFood = new foodModel(foodData);
+        const newFood = new foodModel({...foodData, imageUrl: cloud_img.secure_url, cloudID: cloud_img.public_id});;
         const food = await newFood.save();
         res.status(201).send(food);
     } catch (err) {

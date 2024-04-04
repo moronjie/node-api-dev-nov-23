@@ -9,6 +9,10 @@ const {customError} = require('../middleware/errorMiddleware')
 router.post("/register", (req, res, next)=>{
     
     let user = req.body;
+
+    if(user.name==undefined || user.email==undefined || user.password==undefined || user.age==undefined){
+        return next(customError(400, "Please provide all the required fields"))
+    }
    
 
     bcrypt.genSalt(10,(err,salt)=>{
@@ -41,6 +45,10 @@ router.post("/register", (req, res, next)=>{
 router.post("/login",async (req, res, next)=>{
 
     let userCred = req.body;
+
+    if(userCred.email==undefined || userCred.password==undefined){
+        return next(customError(400, "Please provide email and password"))
+    }
 
     try 
     {
